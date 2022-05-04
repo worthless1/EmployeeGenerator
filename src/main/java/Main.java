@@ -3,9 +3,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -88,14 +86,11 @@ public class Main {
 
     private static void write(List<Employee> list) {
         try (
-                Writer writer = Files.newBufferedWriter(Paths.get("test.csv"), StandardCharsets.UTF_8);
-                CSVPrinter printer = CSVFormat.DEFAULT.print(writer)
+                Writer writer = Files.newBufferedWriter(Paths.get("generated_emps.csv"), StandardCharsets.UTF_8);
+                CSVPrinter printer = new CSVPrinter(writer, CSVFormat.EXCEL.builder().setHeader(
+                        '\ufeff' +"orgPersonId", "lastName", "firstName", "midName", "birthDate", "gender", "orgDeptId",
+                        "orgPostId", "empType", "postType", "postName", "academicDegree", "academicRank", "educationType").build())
         ) {
-//            writer.write(0xEF);
-//            writer.write(0xBB);
-//            writer.write(0xBF);
-            printer.printRecord("orgPersonId", "lastName", "firstName", "midName", "birthDate",
-                    "gender", "orgDeptId", "orgPostId", "empType", "postType", "postName", "academicDegree", "academicRank", "educationType");
             for (Employee emp : list) {
                 printer.printRecord(emp.getList());
             }
