@@ -2,11 +2,10 @@ plugins {
     id 'java'
 }
 
-group 'org.example'
+group 'com.dy.empgen'
 version '1.0-SNAPSHOT'
 
-//compileJava.options.encoding = 'UTF-8'
-//compileTestJava.options.encoding = 'UTF-8'
+compileJava.options.encoding = 'UTF-8'
 
 repositories {
     mavenCentral()

@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Employee {
 
-    private String orgPersonId = String.valueOf((int) (Math.random() * (50000 - 1000)) + 1000);
+    private String orgPersonId;
     private String lastName;
     private String firstName;
     private String midName;
@@ -22,7 +22,8 @@ public class Employee {
     public Employee() {
     }
 
-    public Employee(String lastName, String firstName, String midName, String birthDate, String gender, String orgDeptId, String empType, String postType, String postName, String academicDegree, String academicRank, String educationType) {
+    public Employee(int orgPersonId,String lastName, String firstName, String midName, String birthDate, String gender, String orgDeptId, String empType, String postType, String postName, String academicDegree, String academicRank, String educationType) {
+        this.orgPersonId = Integer.toString(orgPersonId);
         this.lastName = lastName;
         this.firstName = firstName;
         this.midName = midName;
