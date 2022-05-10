@@ -47,7 +47,7 @@ public class Main {
 
     private static List<String[]> readCsv(String fileName) {
         List<String[]> list = new ArrayList<>();
-        try (CSVParser parser = new CSVParser(new FileReader(fileName), CSVFormat.DEFAULT)) {
+        try (CSVParser parser = new CSVParser(new FileReader(fileName, StandardCharsets.UTF_8), CSVFormat.DEFAULT)) {
             for (CSVRecord record : parser) {
                 String[] row = new String[record.size()];
                 for (int i = 0; i < record.size(); i++) {
