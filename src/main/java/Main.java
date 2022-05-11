@@ -47,7 +47,11 @@ public class Main {
 
     private static List<String[]> readCsv(String fileName) {
         List<String[]> list = new ArrayList<>();
-        try (CSVParser parser = new CSVParser(new FileReader(fileName, StandardCharsets.UTF_8), CSVFormat.DEFAULT)) {
+        CSVFormat format = CSVFormat.Builder.create(CSVFormat.DEFAULT)
+                .setHeader()
+                .setSkipHeaderRecord(true)
+                .build();
+        try (CSVParser parser = new CSVParser(new FileReader(fileName, StandardCharsets.UTF_8), format)) {
             for (CSVRecord record : parser) {
                 String[] row = new String[record.size()];
                 for (int i = 0; i < record.size(); i++) {
@@ -55,8 +59,6 @@ public class Main {
                 }
                 list.add(row);
             }
-            //parsing
-//            parser.getRecords().forEach(record -> list.add(record.toList().toArray(new String[record.size()])));
         } catch (IOException e) {
             e.printStackTrace();
         }
