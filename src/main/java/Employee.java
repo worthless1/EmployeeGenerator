@@ -11,7 +11,7 @@ public class Employee {
     private String birthDate;
     private String gender;
     private String orgDeptId;
-    private String orgPostId = String.valueOf((int) (Math.random() * (32000000 - 1000)) + 1000);
+    private String orgPostId;
     private String empType;
     private String postType;
     private String postName;
@@ -22,7 +22,7 @@ public class Employee {
     public Employee() {
     }
 
-    public Employee(int orgPersonId,String lastName, String firstName, String midName, String birthDate, String gender, String orgDeptId, String empType, String postType, String postName, String academicDegree, String academicRank, String educationType) {
+    public Employee(int orgPersonId, String lastName, String firstName, String midName, String birthDate, String gender, String orgDeptId, String orgPostId, String empType, String postType, String postName, String academicDegree, String academicRank, String educationType) {
         this.orgPersonId = Integer.toString(orgPersonId);
         this.lastName = lastName;
         this.firstName = firstName;
@@ -30,6 +30,7 @@ public class Employee {
         this.birthDate = birthDate;
         this.gender = gender;
         this.orgDeptId = orgDeptId;
+        this.orgPostId = orgPostId;
         this.empType = empType;
         this.postType = postType;
         this.postName = postName;

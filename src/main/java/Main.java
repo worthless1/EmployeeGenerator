@@ -10,9 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Main {
 
@@ -27,6 +25,8 @@ public class Main {
     private static final List<String[]> midname = readCsv("sample_midname.csv");
     private static final List<String[]> depts = readCsv("sample_depts.csv");
     private static final List<String[]> postname = readCsv("sample_postname.csv");
+    //used to check for the uniqueness of the generated orgPostId
+    private static Set<Integer> orgPostIds = new HashSet<>();
 
     public static void main(String[] args) throws Exception {
         int numberOfRecords;
@@ -67,6 +67,8 @@ public class Main {
 
     private static List<Employee> generate(int numberOfRecords, int startPersonId) {
         List<Employee> emps = new ArrayList<>();
+
+        Random rand = new Random();
         String gender;
         String academicDegree;
         for (int i = 0; i < numberOfRecords; i++) {
@@ -80,12 +82,17 @@ public class Main {
                     getRandomDate(),
                     gender,
                     getRandomEntry(depts),
+                    getRandomOrgPostId(),
                     empTypes[(int) (Math.random() * 2)],
                     postTypes[(int) (Math.random() * 2)],
                     getRandomEntry(postname),
                     academicDegree,
                     getAcademicRank(academicDegree),
                     educationTypes[(int) (Math.random() * 3)]));
+            //with a probability of 10%, a person holds two positions
+            if (rand.nextInt(10) == 0) {
+                emps.add(i++, getPersonWithDifferentPosition(emps.get(i - 1)));
+            }
         }
         return emps;
     }
@@ -134,4 +141,29 @@ public class Main {
         return "";
     }
 
+    private static String getRandomOrgPostId() {
+        int id = (int) (Math.random() * (32000000 - 1000)) + 1000;
+        while (!orgPostIds.add(id)) {
+            id = (int) (Math.random() * (32000000 - 1000)) + 1000;
+        }
+        return String.valueOf(id);
+    }
+
+    private static Employee getPersonWithDifferentPosition(Employee emp) {
+        return new Employee(
+                Integer.parseInt(emp.getOrgPersonId()),
+                emp.getLastName(),
+                emp.getFirstName(),
+                emp.getMidName(),
+                emp.getBirthDate(),
+                emp.getGender(),
+                getRandomEntry(depts),
+                getRandomOrgPostId(),
+                emp.getEmpType(),
+                emp.getPostType(),
+                getRandomEntry(postname),
+                emp.getAcademicDegree(),
+                emp.getAcademicRank(),
+                emp.getEducationType());
+    }
 }
