@@ -92,6 +92,7 @@ public class Main {
             //with a probability of 10%, a person holds two positions
             if (rand.nextInt(10) == 0) {
                 emps.add(i++, getPersonWithDifferentPosition(emps.get(i - 1)));
+                numberOfRecords++;
             }
         }
         return emps;
