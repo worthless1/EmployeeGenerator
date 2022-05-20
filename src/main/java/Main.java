@@ -20,11 +20,16 @@ public class Main {
     private static final String[] academicDegrees = {"дн", "кн", "", "", "", "", ""};
     private static final String[] educationTypes = {"ВЫСШЕЕ", "ВЫСШЕЕ (СПЕЦИАЛИСТ)", "ВЫСШЕЕ (МАГИСТР)"};
 
-    private static final List<String[]> lastname = readCsv("sample_lastname.csv");
-    private static final List<String[]> firstname = readCsv("sample_firstname.csv");
-    private static final List<String[]> midname = readCsv("sample_midname.csv");
-    private static final List<String[]> depts = readCsv("sample_depts.csv");
-    private static final List<String[]> postname = readCsv("sample_postname.csv");
+    //    private static final List<String[]> lastname = readCsv("sample_lastname.csv");
+//    private static final List<String[]> firstname = readCsv("sample_firstname.csv");
+//    private static final List<String[]> midname = readCsv("sample_midname.csv");
+//    private static final List<String[]> depts = readCsv("sample_depts.csv");
+//    private static final List<String[]> postname = readCsv("sample_postname.csv");
+    private static final CsvDocument lastname = readCsv("sample_lastname.csv");
+    private static final CsvDocument firstname = readCsv("sample_firstname.csv");
+    private static final CsvDocument midname = readCsv("sample_midname.csv");
+    private static final CsvDocument depts = readCsv("sample_depts.csv");
+    private static final CsvDocument postname = readCsv("sample_postname.csv");
     //used to check for the uniqueness of the generated orgPostId
     private static Set<Integer> orgPostIds = new HashSet<>();
 
@@ -45,24 +50,28 @@ public class Main {
             throw new Exception("Specify the number of records to be generated (1-100000)");
     }
 
-    private static List<String[]> readCsv(String fileName) {
-        List<String[]> list = new ArrayList<>();
+    private static CsvDocument readCsv(String fileName) {
+        List<String[]> content = new ArrayList<>();
+        List<String> headers = new ArrayList<>();
         CSVFormat format = CSVFormat.Builder.create(CSVFormat.DEFAULT)
                 .setHeader()
                 .setSkipHeaderRecord(true)
                 .build();
         try (CSVParser parser = new CSVParser(new FileReader(fileName, StandardCharsets.UTF_8), format)) {
+            headers = new ArrayList<>(parser.getHeaderNames());
+            ;
+            headers.set(0, headers.get(0).replaceAll("[\\p{Cf}]", ""));
             for (CSVRecord record : parser) {
                 String[] row = new String[record.size()];
                 for (int i = 0; i < record.size(); i++) {
                     row[i] = record.get(i);
                 }
-                list.add(row);
+                content.add(row);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return list;
+        return new CsvDocument(fileName, headers, content);
     }
 
     private static List<Employee> generate(int numberOfRecords, int startPersonId) {
@@ -76,16 +85,16 @@ public class Main {
             academicDegree = academicDegrees[(int) (Math.random() * 7)];
             emps.add(i, new Employee(
                     startPersonId++,
-                    getRandomName(lastname, gender),
-                    getRandomName(firstname, gender),
-                    getRandomName(midname, gender),
+                    getRandomName(lastname, gender, "lastname"),
+                    getRandomName(firstname, gender, "firstname"),
+                    getRandomName(midname, gender, "midname"),
                     getRandomDate(),
                     gender,
-                    getRandomEntry(depts),
+                    getRandomEntry(depts, "DEPT_ID"),
                     getRandomOrgPostId(),
                     empTypes[(int) (Math.random() * 2)],
                     postTypes[(int) (Math.random() * 2)],
-                    getRandomEntry(postname),
+                    getRandomEntry(postname, "postName"),
                     academicDegree,
                     getAcademicRank(academicDegree),
                     educationTypes[(int) (Math.random() * 3)]));
@@ -113,16 +122,21 @@ public class Main {
         }
     }
 
-    private static String getRandomEntry(List<String[]> list) {
-        return list.get((int) (Math.random() * list.size()))[0];
+    private static String getRandomEntry(CsvDocument csv, String headerName) {
+        int index = getHeaderIndex(csv, headerName);
+        return csv.getContent().get((int) (Math.random() * csv.getContent().size()))[index];
     }
 
-    private static String getRandomName(List<String[]> list, String gender) {
+    private static String getRandomName(CsvDocument csv, String gender, String headerName) {
         String[] name = {"", ""};
-        while (!name[1].equals(gender)) {
-            name = list.get((int) (Math.random() * list.size()));
+        while (!name[getHeaderIndex(csv, "gender")].equals(gender)) {
+            name = csv.getContent().get((int) (Math.random() * csv.getContent().size()));
         }
-        return name[0];
+        return name[getHeaderIndex(csv, headerName)];
+    }
+
+    private static int getHeaderIndex(CsvDocument csv, String headerName) {
+        return csv.getHeaderNames().indexOf(headerName);
     }
 
     private static String getRandomDate() {
@@ -130,7 +144,6 @@ public class Main {
         int minDay = (int) LocalDate.of(1960, 1, 1).toEpochDay();
         int maxDay = (int) LocalDate.of(1995, 1, 1).toEpochDay();
         long randomDay = minDay + random.nextInt(maxDay - minDay);
-
         return LocalDate.ofEpochDay(randomDay).toString();
     }
 
@@ -158,11 +171,11 @@ public class Main {
                 emp.getMidName(),
                 emp.getBirthDate(),
                 emp.getGender(),
-                getRandomEntry(depts),
+                getRandomEntry(depts, "DEPT_ID"),
                 getRandomOrgPostId(),
                 emp.getEmpType(),
                 emp.getPostType(),
-                getRandomEntry(postname),
+                getRandomEntry(postname, "postName"),
                 emp.getAcademicDegree(),
                 emp.getAcademicRank(),
                 emp.getEducationType());
